@@ -4,15 +4,15 @@ import Teste from './Teste';
 import { TipoAeronave } from './Enums';
 
 export default class Aeronave { 
-    codigo: string;
-    modelo: string
-    tipo: TipoAeronave;
-    capacidade: number;
-    alcance: number;
+    private codigo: string;
+    private modelo: string;
+    private tipo: TipoAeronave;
+    private capacidade: number;
+    private alcance: number;
 
-    pecas: Peca[];
-    etapas: Etapa[]
-    testes: Teste[];
+    private pecas: Peca[];
+    private etapas: Etapa[]
+    private testes: Teste[];
 
     constructor(codigo: string, modelo: string, tipo: TipoAeronave, capacidade: number, alcance: number) {
         this.codigo = codigo;
@@ -24,6 +24,72 @@ export default class Aeronave {
         this.pecas = [];
         this.etapas = [];
         this.testes = [];
+    }
+
+    // Getters
+    get getCodigo(): string {
+        return this.codigo;
+    }
+
+    get getModelo(): string {
+        return this.modelo;
+    }
+
+    get getTipo(): TipoAeronave {
+        return this.tipo;
+    }
+
+    get getCapacidade(): number {
+        return this.capacidade;
+    }
+
+    get getAlcance(): number {
+        return this.alcance;
+    }
+
+    get getPecas(): Peca[] {
+        return this.pecas;
+    }
+
+    get getEtapas(): Etapa[] {
+        return this.etapas;
+    }
+
+    get getTestes(): Teste[] {
+        return this.testes;
+    }
+
+    // Setters
+    set setCodigo(codigo: string) {
+        this.codigo = codigo;
+    }
+
+    set setModelo(modelo: string) {
+        this.modelo = modelo;
+    }
+
+    set setTipo(tipo: TipoAeronave) {
+        this.tipo = tipo;
+    }
+
+    set setCapacidade(capacidade: number) {
+        this.capacidade = capacidade;
+    }
+
+    set setAlcance(alcance: number) {
+        this.alcance = alcance;
+    }
+
+    set setPecas(pecas: Peca[]) {
+        this.pecas = pecas;
+    }
+
+    set setEtapas(etapas: Etapa[]) {
+        this.etapas = etapas;
+    }
+
+    set setTestes(testes: Teste[]) {
+        this.testes = testes;
     }
 
     detalhes(): void { 
@@ -40,7 +106,7 @@ export default class Aeronave {
             console.log('Nenhuma peça cadastrada.');
         } else {
             this.pecas.forEach(peca => {
-                console.log(`Peça: ${peca.nome}, Tipo: ${peca.tipo}, Status: ${peca.status}`);
+                console.log(`Peça: ${peca.getNome}, Tipo: ${peca.getTipo}, Status: ${peca.getStatus}`);
             });
         }
         console.log('---------------------------');
@@ -50,7 +116,7 @@ export default class Aeronave {
             console.log('Nenhuma etapa cadastrada.');
         } else {
             this.etapas.forEach(etapa => {
-                console.log(`Etapa: ${etapa.nome}, Status: ${etapa.status}, Prazo: ${etapa.prazo}`);
+                console.log(`Etapa: ${etapa.getNome}, Status: ${etapa.getStatus}, Prazo: ${etapa.getPrazo}`);
             });
         }
         console.log('---------------------------');
@@ -60,7 +126,7 @@ export default class Aeronave {
             console.log('Nenhum teste cadastrado.');
         } else {
             this.testes.forEach(teste => {
-                console.log(`Teste: ${teste.tipo}, Resultado: ${teste.resultado}`);
+                console.log(`Teste: ${teste.getTipo}, Resultado: ${teste.getResultado}`);
             });
         }
         console.log('---------------------------');
