@@ -1,5 +1,5 @@
 {
-  "name": "av1",
+  "name": "aerocode",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,5 +8,9 @@
     "dev": "tsc && node ./dist/index.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "typescript": "^5.9.2"
+  }
 }
