@@ -90,6 +90,8 @@ export default class AerocodeSystem {
             return;
         }
 
+        console.clear();
+        console.log(`Usuario logado: ${this.usuarioLogado.getNome} (Tipo: ${this.usuarioLogado.getNivelPermissao})`);
         console.log("\nMenu Principal:");
         console.log("[1] Gerenciar Aeronaves");
         console.log("[2] Gerenciar Funcionários");
@@ -98,5 +100,116 @@ export default class AerocodeSystem {
         console.log("[5] Gerenciar Testes");
         console.log("[0] Logout");
         console.log("-------------------------");
+        this.leitor.question("Escolha uma opção: ", (opcao) => {
+            switch (opcao) {
+                case '1':
+                    this.mostrarMenuPrincipal(); // Gerenciar aeronaves
+                    break;
+                case '2':
+                    if (this.usuarioLogado?.getNivelPermissao === NivelPermissao.ADMINISTRADOR) {
+                        this.gerenciarFuncionarios();
+                    } else {
+                        console.log("Acesso negado. Apenas administradores podem gerenciar funcionários.");
+                        this.mostrarMenuPrincipal();
+                    }
+                    break;
+                case '3':
+                    this.mostrarMenuPrincipal(); // Gerenciar etapas
+                    break;
+                case '4':
+                    this.mostrarMenuPrincipal(); // Gerenciar peças
+                    break;
+                case '5':
+                    this.mostrarMenuPrincipal(); // Gerenciar testes
+                    break;
+                case '0':
+                    this.usuarioLogado = null;
+                    console.log("Logout realizado com sucesso.");
+                    this.mostrarMenuAcesso();
+                    break;
+                default:
+                    console.log("Opção inválida. Tente novamente.");
+                    this.mostrarMenuPrincipal();
+            }
+        });
     }
+
+    private gerenciarFuncionarios(): void {
+        console.log("\nGerenciar Funcionários:");
+        console.log("[1] Adicionar Funcionário");
+        console.log("[2] Listar Funcionários");
+        console.log("[0] Voltar ao Menu Principal");
+        console.log("-------------------------");
+        this.leitor.question("Escolha uma opção: ", (opcao) => {
+            switch (opcao) {
+                case '1':
+                    this.adicionarFuncionario();
+                    break;
+                case '2':
+                    this.listarFuncionarios();
+                    break;
+                case '0':
+                    this.mostrarMenuPrincipal();
+                    break;
+                default:
+                    console.log("Opção inválida. Tente novamente.");
+                    this.gerenciarFuncionarios();
+            }
+        });
+    }
+
+    private adicionarFuncionario(): void {
+        this.leitor.question("Nome: ", (nome) => {
+            this.leitor.question("Telefone: ", (telefone) => {
+                this.leitor.question("Endereço: ", (endereco) => {
+                    this.leitor.question("Usuário: ", (usuario) => {
+                        this.leitor.question("Senha: ", (senha) => {
+                            this.leitor.question("Nível de Permissão ([1]Administrador, [2]Engenheiro, [3]Operador): ", (nivel) => {
+                                let permissao: NivelPermissao = NivelPermissao.OPERADOR;
+                                if (![1, 2, 3].includes(parseInt(nivel))) {
+                                    console.log("Nível de permissão inválido. Tente novamente.");
+                                    this.gerenciarFuncionarios();
+                                    return;
+                                } else {
+                                    switch (nivel) {
+                                        case "1":
+                                            permissao = NivelPermissao.ADMINISTRADOR;
+                                            break;
+                                        case "2":
+                                            permissao = NivelPermissao.ENGENHEIRO;
+                                            break;
+                                        case "3":
+                                            permissao = NivelPermissao.OPERADOR;
+                                            break;
+                                    }
+                                }
+                                const novoFuncionario = new Funcionario(
+                                    (this.funcionarios.length + 1).toString(),
+                                    nome,
+                                    telefone,
+                                    endereco,
+                                    usuario,
+                                    senha,
+                                    permissao
+                                );
+                                this.funcionarios.push(novoFuncionario);
+                                console.log(`Funcionário ${nome} adicionado com sucesso!`);
+                                this.gerenciarFuncionarios();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    private listarFuncionarios(): void {
+        console.clear();
+        console.log("\nLista de Funcionários:");
+        this.funcionarios.forEach((funcionario) => {
+            console.log(`ID: ${funcionario.getId}, Nome: ${funcionario.getNome}, Telefone: ${funcionario.getTelefone}, Endereço: ${funcionario.getEndereco}, Usuário: ${funcionario.getUsuario}, Nível de Permissão: ${funcionario.getNivelPermissao}`);
+        });
+        this.gerenciarFuncionarios();
+    }
+
 }
