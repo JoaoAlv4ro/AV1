@@ -6,6 +6,8 @@ import Peca from "./model/Peca";
 import Teste from "./model/Teste";
 import * as readline from 'readline';
 
+import GerenciadorAeronave from "./gestao/GerenciadorAeronave";
+
 
 export default class AerocodeSystem {
     private leitor: readline.Interface;
@@ -14,6 +16,8 @@ export default class AerocodeSystem {
     private funcionarios: Funcionario[] = [];
 
     private usuarioLogado: Funcionario | null = null;
+
+    private gerenciadorAeronave: GerenciadorAeronave = new GerenciadorAeronave();
 
     constructor() {
         this.leitor = readline.createInterface({
@@ -137,10 +141,10 @@ export default class AerocodeSystem {
             const aeronave = this.aeronaves.find(a => a.getCodigo === codigo);
             if (aeronave) {
                 console.log(`Gerenciando aeronave: ${aeronave.getModelo}`);
-                // Implementar opções de gerenciamento (editar, remover, etc.)
+                this.gerenciadorAeronave.gerenciar(aeronave);
             } else {
                 console.log("Aeronave não encontrada.");
-                this.gerenciarAeronaves();
+                this.mostrarMenuPrincipal();
             }
         });
     }
