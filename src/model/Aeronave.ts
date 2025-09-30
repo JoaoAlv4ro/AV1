@@ -93,6 +93,7 @@ export default class Aeronave {
     }
 
     detalhes(): void { 
+        console.log(' ');
         console.log('--- Detalhes da Aeronave ---');
         console.log(`Código: ${this.codigo}`);
         console.log(`Modelo: ${this.modelo}`);
@@ -130,5 +131,6 @@ export default class Aeronave {
             });
         }
         console.log('---------------------------');
+        console.log(' ');
     }
 }

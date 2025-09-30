@@ -1,5 +1,5 @@
 import Aeronave from "./model/Aeronave";
-import { NivelPermissao } from "./model/Enums";
+import { NivelPermissao, TipoAeronave } from "./model/Enums";
 import Etapa from "./model/Etapa";
 import Funcionario from "./model/Funcionario";
 import Peca from "./model/Peca";
@@ -12,9 +12,6 @@ export default class AerocodeSystem {
 
     private aeronaves: Aeronave[] = [];
     private funcionarios: Funcionario[] = [];
-    private etapas: Etapa[] = [];
-    private pecas: Peca[] = [];
-    private testes: Teste[] = [];
 
     private usuarioLogado: Funcionario | null = null;
 
@@ -90,37 +87,38 @@ export default class AerocodeSystem {
             return;
         }
 
-        console.clear();
+        console.log();
         console.log(`Usuario logado: ${this.usuarioLogado.getNome} (Tipo: ${this.usuarioLogado.getNivelPermissao})`);
-        console.log("\nMenu Principal:");
+        console.log("---- Menu Principal: ----");
         console.log("[1] Gerenciar Aeronaves");
-        console.log("[2] Gerenciar Funcionários");
-        console.log("[3] Gerenciar Etapas");
-        console.log("[4] Gerenciar Peças");
-        console.log("[5] Gerenciar Testes");
+        console.log("[2] Adicionar Aeronave");
+        console.log("[3] Listar Aeronaves");
+        console.log("[4] Remover Aeronave");
         console.log("[0] Logout");
         console.log("-------------------------");
         this.leitor.question("Escolha uma opção: ", (opcao) => {
             switch (opcao) {
                 case '1':
-                    this.mostrarMenuPrincipal(); // Gerenciar aeronaves
+                    this.gerenciarAeronaves();
                     break;
                 case '2':
                     if (this.usuarioLogado?.getNivelPermissao === NivelPermissao.ADMINISTRADOR) {
-                        this.gerenciarFuncionarios();
+                        this.adicionarAeronave();
                     } else {
                         console.log("Acesso negado. Apenas administradores podem gerenciar funcionários.");
                         this.mostrarMenuPrincipal();
                     }
                     break;
                 case '3':
-                    this.mostrarMenuPrincipal(); // Gerenciar etapas
+                    this.listarAeronaves();
                     break;
                 case '4':
-                    this.mostrarMenuPrincipal(); // Gerenciar peças
-                    break;
-                case '5':
-                    this.mostrarMenuPrincipal(); // Gerenciar testes
+                    if (this.usuarioLogado?.getNivelPermissao === NivelPermissao.ADMINISTRADOR) {
+                        this.leitor.question("Digite o código da aeronave a ser removida: ", (codigo) => {
+                            this.removerAeronave(codigo);
+                            setTimeout(() => this.mostrarMenuPrincipal(), 1000);
+                        });
+                    }
                     break;
                 case '0':
                     this.usuarioLogado = null;
@@ -134,82 +132,78 @@ export default class AerocodeSystem {
         });
     }
 
-    private gerenciarFuncionarios(): void {
-        console.log("\nGerenciar Funcionários:");
-        console.log("[1] Adicionar Funcionário");
-        console.log("[2] Listar Funcionários");
-        console.log("[0] Voltar ao Menu Principal");
-        console.log("-------------------------");
-        this.leitor.question("Escolha uma opção: ", (opcao) => {
-            switch (opcao) {
-                case '1':
-                    this.adicionarFuncionario();
-                    break;
-                case '2':
-                    this.listarFuncionarios();
-                    break;
-                case '0':
-                    this.mostrarMenuPrincipal();
-                    break;
-                default:
-                    console.log("Opção inválida. Tente novamente.");
-                    this.gerenciarFuncionarios();
+    private gerenciarAeronaves(): void {
+        this.leitor.question("Digite o código da aeronave: ", (codigo) => {
+            const aeronave = this.aeronaves.find(a => a.getCodigo === codigo);
+            if (aeronave) {
+                console.log(`Gerenciando aeronave: ${aeronave.getModelo}`);
+                // Implementar opções de gerenciamento (editar, remover, etc.)
+            } else {
+                console.log("Aeronave não encontrada.");
+                this.gerenciarAeronaves();
             }
         });
     }
-
-    private adicionarFuncionario(): void {
-        this.leitor.question("Nome: ", (nome) => {
-            this.leitor.question("Telefone: ", (telefone) => {
-                this.leitor.question("Endereço: ", (endereco) => {
-                    this.leitor.question("Usuário: ", (usuario) => {
-                        this.leitor.question("Senha: ", (senha) => {
-                            this.leitor.question("Nível de Permissão ([1]Administrador, [2]Engenheiro, [3]Operador): ", (nivel) => {
-                                let permissao: NivelPermissao = NivelPermissao.OPERADOR;
-                                if (![1, 2, 3].includes(parseInt(nivel))) {
-                                    console.log("Nível de permissão inválido. Tente novamente.");
-                                    this.gerenciarFuncionarios();
-                                    return;
-                                } else {
-                                    switch (nivel) {
-                                        case "1":
-                                            permissao = NivelPermissao.ADMINISTRADOR;
-                                            break;
-                                        case "2":
-                                            permissao = NivelPermissao.ENGENHEIRO;
-                                            break;
-                                        case "3":
-                                            permissao = NivelPermissao.OPERADOR;
-                                            break;
-                                    }
-                                }
-                                const novoFuncionario = new Funcionario(
-                                    (this.funcionarios.length + 1).toString(),
-                                    nome,
-                                    telefone,
-                                    endereco,
-                                    usuario,
-                                    senha,
-                                    permissao
-                                );
-                                this.funcionarios.push(novoFuncionario);
-                                console.log(`Funcionário ${nome} adicionado com sucesso!`);
-                                this.gerenciarFuncionarios();
-                            });
-                        });
+    
+    private adicionarAeronave(): void {
+        this.leitor.question("Digite o modelo da aeronave: ", (modelo) => {
+            this.leitor.question("Digite o tipo da aeronave ([1]Comercial, [2]Militar): ", (tipo) => {
+                let tipoAeronave: TipoAeronave = TipoAeronave.COMERCIAL;
+                if (tipo !== '1' && tipo !== '2') {
+                    console.log("Tipo inválido. Tente novamente.");
+                    this.mostrarMenuPrincipal();
+                    return;
+                } else {
+                    switch (tipo) {
+                        case "1":
+                            tipoAeronave = TipoAeronave.COMERCIAL;
+                            break;
+                        case "2":
+                            tipoAeronave = TipoAeronave.MILITAR;
+                            break;
+                    }
+                }
+                this.leitor.question("Digite a capacidade da aeronave: ", (capacidade) => {
+                    this.leitor.question("Digite o alcance da aeronave: ", (alcance) => {
+                        const novaAeronave = new Aeronave(
+                            (this.aeronaves.length + 1).toString(),
+                            modelo,
+                            tipoAeronave,
+                            parseInt(capacidade),
+                            parseInt(alcance)
+                        );
+                        this.aeronaves.push(novaAeronave);
+                        console.log(`Aeronave ${modelo} adicionada com sucesso!`);
+                        setTimeout(() => this.mostrarMenuPrincipal(), 1000);
                     });
                 });
             });
         });
     }
 
-    private listarFuncionarios(): void {
+    private listarAeronaves(): void {
         console.clear();
-        console.log("\nLista de Funcionários:");
-        this.funcionarios.forEach((funcionario) => {
-            console.log(`ID: ${funcionario.getId}, Nome: ${funcionario.getNome}, Telefone: ${funcionario.getTelefone}, Endereço: ${funcionario.getEndereco}, Usuário: ${funcionario.getUsuario}, Nível de Permissão: ${funcionario.getNivelPermissao}`);
+        console.log("\n----- Lista de Aeronaves: -----");
+        if (this.aeronaves.length === 0) {
+            console.log("Nenhuma aeronave cadastrada.");
+        } else {
+            this.aeronaves.forEach((aeronave) => {
+                aeronave.detalhes();
+            });
+        }
+        this.leitor.question("\nPressione Enter para voltar ao menu principal...", () => {
+            this.mostrarMenuPrincipal();
         });
-        this.gerenciarFuncionarios();
     }
 
+    private removerAeronave(codigo: string): void {
+        const index = this.aeronaves.findIndex(a => a.getCodigo === codigo);
+        if (index !== -1) {
+            this.aeronaves.splice(index, 1);
+            console.log(`Aeronave com código ${codigo} removida com sucesso!`);
+        } else {
+            console.log("Aeronave não encontrada.");
+            this.mostrarMenuPrincipal();
+        }
+    }
 }
