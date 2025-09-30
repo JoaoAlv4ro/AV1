@@ -17,13 +17,14 @@ export default class AerocodeSystem {
 
     private usuarioLogado: Funcionario | null = null;
 
-    private gerenciadorAeronave: GerenciadorAeronave = new GerenciadorAeronave();
+    private gerenciadorAeronave: GerenciadorAeronave;
 
     constructor() {
         this.leitor = readline.createInterface({
             input: process.stdin,
             output: process.stdout
         });
+        this.gerenciadorAeronave = new GerenciadorAeronave(this.leitor);
     }
 
     private criarAdmin(): void {
@@ -76,10 +77,10 @@ export default class AerocodeSystem {
                 if (funcionario?.autenticar(user, senha)) {
                     this.usuarioLogado = funcionario;
                     console.log(`Login bem-sucedido! Bem-vindo, ${this.usuarioLogado.getNome}.`);
-                    this.mostrarMenuPrincipal();
+                    setTimeout(() => this.mostrarMenuPrincipal(), 1000);
                 } else {
                     console.log("Nome de usuário ou senha incorretos. Tente novamente.");
-                    this.mostrarMenuPrincipal();
+                    setTimeout(() => this.mostrarMenuAcesso(), 1000);
                 }
             });
         });
@@ -110,7 +111,7 @@ export default class AerocodeSystem {
                         this.adicionarAeronave();
                     } else {
                         console.log("Acesso negado. Apenas administradores podem gerenciar funcionários.");
-                        this.mostrarMenuPrincipal();
+                        setTimeout(() => this.mostrarMenuPrincipal(), 1000);
                     }
                     break;
                 case '3':
@@ -127,7 +128,7 @@ export default class AerocodeSystem {
                 case '0':
                     this.usuarioLogado = null;
                     console.log("Logout realizado com sucesso.");
-                    this.mostrarMenuAcesso();
+                    setTimeout(() => this.mostrarMenuAcesso(), 1000);
                     break;
                 default:
                     console.log("Opção inválida. Tente novamente.");
@@ -141,10 +142,12 @@ export default class AerocodeSystem {
             const aeronave = this.aeronaves.find(a => a.getCodigo === codigo);
             if (aeronave) {
                 console.log(`Gerenciando aeronave: ${aeronave.getModelo}`);
-                this.gerenciadorAeronave.gerenciar(aeronave);
+                this.gerenciadorAeronave.gerenciar(aeronave, () => {
+                    this.mostrarMenuPrincipal();
+                });
             } else {
                 console.log("Aeronave não encontrada.");
-                this.mostrarMenuPrincipal();
+                setTimeout(() => this.mostrarMenuPrincipal(), 1000);
             }
         });
     }
@@ -155,7 +158,7 @@ export default class AerocodeSystem {
                 let tipoAeronave: TipoAeronave = TipoAeronave.COMERCIAL;
                 if (tipo !== '1' && tipo !== '2') {
                     console.log("Tipo inválido. Tente novamente.");
-                    this.mostrarMenuPrincipal();
+                    setTimeout(() => this.mostrarMenuPrincipal(), 1000);
                     return;
                 } else {
                     switch (tipo) {
@@ -207,7 +210,7 @@ export default class AerocodeSystem {
             console.log(`Aeronave com código ${codigo} removida com sucesso!`);
         } else {
             console.log("Aeronave não encontrada.");
-            this.mostrarMenuPrincipal();
+            setTimeout(() => this.mostrarMenuPrincipal(), 1000);
         }
     }
 }

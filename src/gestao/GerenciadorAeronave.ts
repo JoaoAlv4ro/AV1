@@ -6,14 +6,11 @@ import { TipoAeronave } from "../model/Enums";
 export default class GerenciadorAeronave {
     private leitor: readline.Interface;
 
-    constructor() {
-        this.leitor = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
+    constructor(leitor: readline.Interface) {
+        this.leitor = leitor;
     }
 
-    public gerenciar(aeronave: Aeronave): void {
+    public gerenciar(aeronave: Aeronave, onVoltar: () => void): void {
         console.log("\nMenu de Gerenciamento:");
         console.log("[1] Editar Aeronave");
         console.log("[2] Gerenciar Peças");
@@ -25,31 +22,31 @@ export default class GerenciadorAeronave {
         this.leitor.question("Escolha uma opção: ", (opcao) => {
             switch (opcao) {
                 case '1':
-                    this.editarAeronave(aeronave);
+                    this.editarAeronave(aeronave, onVoltar);
                     break;
                 case '2':
                     console.log("Funcionalidade de gerenciamento de peças ainda não implementada.");
-                    this.gerenciar(aeronave);
+                    this.gerenciar(aeronave, onVoltar);
                     break;
                 case '3':
                     console.log("Funcionalidade de gerenciamento de etapas ainda não implementada.");
-                    this.gerenciar(aeronave);
+                    this.gerenciar(aeronave, onVoltar);
                     break;
                 case '4':
                     console.log("Funcionalidade de gerenciamento de testes ainda não implementada.");
-                    this.gerenciar(aeronave);
+                    this.gerenciar(aeronave, onVoltar);
                     break;
                 case '0':
-                    this.leitor.close();
+                    onVoltar();
                     break;
                 default:
                     console.log("Opção inválida. Tente novamente.");
-                    this.gerenciar(aeronave);
+                    this.gerenciar(aeronave, onVoltar);
             }
         });
     }
 
-    private editarAeronave(aeronave: Aeronave): void {
+    private editarAeronave(aeronave: Aeronave, onVoltar: () => void): void {
         console.log(`\nEditando Aeronave ${aeronave.getCodigo}`);
         console.log("O que deseja editar?");
         console.log("[1] Modelo");
@@ -70,7 +67,7 @@ export default class GerenciadorAeronave {
                         } else {
                             console.log("Modelo mantido.");
                         }
-                        this.editarAeronave(aeronave);
+                        this.editarAeronave(aeronave, onVoltar);
                     });
                     break;
                 case '2':
@@ -86,7 +83,7 @@ export default class GerenciadorAeronave {
                         } else {
                             console.log("Opção inválida.");
                         }
-                        this.editarAeronave(aeronave);
+                        this.editarAeronave(aeronave, onVoltar);
                     });
                     break;
                 case '3':
@@ -98,7 +95,7 @@ export default class GerenciadorAeronave {
                         } else {
                             console.log("Valor inválido.");
                         }
-                        this.editarAeronave(aeronave);
+                        this.editarAeronave(aeronave, onVoltar);
                     });
                     break;
                 case '4':
@@ -110,15 +107,15 @@ export default class GerenciadorAeronave {
                         } else {
                             console.log("Valor inválido.");
                         }
-                        this.editarAeronave(aeronave);
+                        this.editarAeronave(aeronave, onVoltar);
                     });
                     break;
                 case '0':
-                    this.gerenciar(aeronave);
+                    this.gerenciar(aeronave, onVoltar);
                     break;
                 default:
                     console.log("Opção inválida. Tente novamente.");
-                    this.editarAeronave(aeronave);
+                    this.editarAeronave(aeronave, onVoltar);
             }
         });
     }
