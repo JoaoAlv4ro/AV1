@@ -2,16 +2,19 @@ import * as readline from 'readline';
 import Aeronave from "../model/Aeronave";
 import { TipoAeronave } from "../model/Enums";
 import GerenciadorPeca from "./GerenciadorPeca";
+import GerenciadorTeste from "./GerenciadorTeste";
 
 
 export default class GerenciadorAeronave {
     private leitor: readline.Interface;
 
     private gerenciadorPeca: GerenciadorPeca;
+    private gerenciadorTeste: GerenciadorTeste;
 
     constructor(leitor: readline.Interface) {
         this.leitor = leitor;
         this.gerenciadorPeca = new GerenciadorPeca(this.leitor);
+        this.gerenciadorTeste = new GerenciadorTeste(this.leitor);
     }
 
     public gerenciar(aeronave: Aeronave, onVoltar: () => void): void {
@@ -36,8 +39,7 @@ export default class GerenciadorAeronave {
                     this.gerenciar(aeronave, onVoltar);
                     break;
                 case '4':
-                    console.log("Funcionalidade de gerenciamento de testes ainda não implementada.");
-                    this.gerenciar(aeronave, onVoltar);
+                    this.gerenciadorTeste.gerenciar(aeronave, () => this.gerenciar(aeronave, onVoltar));
                     break;
                 case '0':
                     onVoltar();
