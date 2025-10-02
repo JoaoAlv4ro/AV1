@@ -1,12 +1,14 @@
 import { TipoPeca, StatusPeca } from "./Enums";
 
 export default class Peca { 
+    private codigo: string;
     private nome: string;
     private tipo: TipoPeca;
     private fornecedor: string;
     private status: StatusPeca;
 
-    constructor(nome: string, tipo: TipoPeca, fornecedor: string, status: StatusPeca) {
+    constructor(codigo: string, nome: string, tipo: TipoPeca, fornecedor: string, status: StatusPeca) {
+        this.codigo = codigo;
         this.nome = nome;
         this.tipo = tipo;
         this.fornecedor = fornecedor;
@@ -14,6 +16,10 @@ export default class Peca {
     }
 
     // Getters
+    get getCodigo(): string {
+        return this.codigo;
+    }
+
     get getNome(): string {
         return this.nome;
     }

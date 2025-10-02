@@ -1,9 +1,7 @@
 import Aeronave from "./model/Aeronave";
 import { NivelPermissao, TipoAeronave } from "./model/Enums";
-import Etapa from "./model/Etapa";
 import Funcionario from "./model/Funcionario";
-import Peca from "./model/Peca";
-import Teste from "./model/Teste";
+
 import * as readline from 'readline';
 
 import GerenciadorAeronave from "./gestao/GerenciadorAeronave";
@@ -138,6 +136,18 @@ export default class AerocodeSystem {
     }
 
     private gerenciarAeronaves(): void {
+        if (this.aeronaves.length === 0) {
+            console.log("Nenhuma aeronave cadastrada para gerenciar.");
+            setTimeout(() => this.mostrarMenuPrincipal(), 1000);
+            return;
+        }
+
+        console.log("\n--- Aeronaves Disponíveis ---");
+        this.aeronaves.forEach(aeronave => {
+            console.log(`Código: ${aeronave.getCodigo}, Modelo: ${aeronave.getModelo}`);
+        });
+        console.log("-------------------------");
+
         this.leitor.question("Digite o código da aeronave: ", (codigo) => {
             const aeronave = this.aeronaves.find(a => a.getCodigo === codigo);
             if (aeronave) {

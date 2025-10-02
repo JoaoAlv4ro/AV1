@@ -1,13 +1,17 @@
 import * as readline from 'readline';
 import Aeronave from "../model/Aeronave";
 import { TipoAeronave } from "../model/Enums";
+import GerenciadorPeca from "./GerenciadorPeca";
 
 
 export default class GerenciadorAeronave {
     private leitor: readline.Interface;
 
+    private gerenciadorPeca: GerenciadorPeca;
+
     constructor(leitor: readline.Interface) {
         this.leitor = leitor;
+        this.gerenciadorPeca = new GerenciadorPeca(this.leitor);
     }
 
     public gerenciar(aeronave: Aeronave, onVoltar: () => void): void {
@@ -25,8 +29,7 @@ export default class GerenciadorAeronave {
                     this.editarAeronave(aeronave, onVoltar);
                     break;
                 case '2':
-                    console.log("Funcionalidade de gerenciamento de peças ainda não implementada.");
-                    this.gerenciar(aeronave, onVoltar);
+                    this.gerenciadorPeca.gerenciar(aeronave, () => this.gerenciar(aeronave, onVoltar));
                     break;
                 case '3':
                     console.log("Funcionalidade de gerenciamento de etapas ainda não implementada.");
