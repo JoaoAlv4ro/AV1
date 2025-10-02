@@ -133,4 +133,14 @@ export default class Aeronave {
         console.log('---------------------------');
         console.log(' ');
     }
+
+    public adicionarTeste(teste: Teste): void {
+        this.testes.push(teste);
+    }
+
+    public removerTeste(index: number): void {
+        if (index >= 0 && index < this.testes.length) {
+            this.testes.splice(index, 1);
+        }
+    }
 }
