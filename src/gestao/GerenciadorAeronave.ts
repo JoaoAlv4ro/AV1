@@ -31,6 +31,7 @@ export default class GerenciadorAeronave {
         console.log("[2] Gerenciar Peças");
         console.log(`[3] Gerenciar Etapas`);
         console.log(`[4] Gerenciar Testes`);
+        console.log("[5] Gerar Relatório");
         console.log("[0] Voltar");
         console.log("-------------------------");
 
@@ -47,6 +48,9 @@ export default class GerenciadorAeronave {
                     break;
                 case '4':
                     this.gerenciadorTeste.gerenciar(aeronave, () => this.gerenciar(aeronave, this.usuarioLogado, onVoltar));
+                    break;
+                case '5':
+                    this.gerarRelatorio(aeronave, () => this.gerenciar(aeronave, this.usuarioLogado, onVoltar));
                     break;
                 case '0':
                     onVoltar();
@@ -130,5 +134,66 @@ export default class GerenciadorAeronave {
                     this.editarAeronave(aeronave, onVoltar);
             }
         });
+    }
+
+    private gerarRelatorio(aeronave: Aeronave, onVoltar: () => void): void {
+        const data = new Date();
+        const dataFormatada = data.toLocaleString('pt-BR').replace(/[\/\s:]/g, '_').replace(/,/g, '');
+        const nomeArquivo = `relatorio_${aeronave.getModelo}_${dataFormatada}.txt`;
+        const caminho = `./relatorios/${nomeArquivo}`;
+
+        // Cria o diretório se não existir
+        const fs = require('fs');
+        if (!fs.existsSync('./relatorios')) {
+            fs.mkdirSync('./relatorios');
+        }
+
+        // Gera o conteúdo do relatório no mesmo formato do método detalhes
+        let conteudo = ' \n';
+        conteudo += `===== Relatório de Aeronave: ${aeronave.getModelo} =====\n`;
+        conteudo += '--- Detalhes da Aeronave ---\n';
+        conteudo += `Código: ${aeronave.getCodigo}\n`;
+        conteudo += `Modelo: ${aeronave.getModelo}\n`;
+        conteudo += `Tipo: ${aeronave.getTipo}\n`;
+        conteudo += `Capacidade: ${aeronave.getCapacidade} passageiros\n`;
+        conteudo += `Alcance: ${aeronave.getAlcance} km\n`;
+        conteudo += '---------------------------\n';
+
+        conteudo += `--- Peças Associadas: ${aeronave.getPecas.length} ---\n`;
+        if (aeronave.getPecas.length === 0) {
+            conteudo += 'Nenhuma peça cadastrada.\n';
+        } else {
+            aeronave.getPecas.forEach(peca => {
+                conteudo += `Peça: ${peca.getNome}, Tipo: ${peca.getTipo}, Status: ${peca.getStatus}\n`;
+            });
+        }
+        conteudo += '---------------------------\n';
+
+        conteudo += `--- Etapas Associadas: ${aeronave.getEtapas.length} ---\n`;
+        if (aeronave.getEtapas.length === 0) {
+            conteudo += 'Nenhuma etapa cadastrada.\n';
+        } else {
+            aeronave.getEtapas.forEach(etapa => {
+                conteudo += `Etapa: ${etapa.getNome}, Status: ${etapa.getStatus}, Prazo: ${etapa.getPrazo}\n`;
+            });
+        }
+        conteudo += '---------------------------\n';
+
+        conteudo += `--- Testes Associados: ${aeronave.getTestes.length} ---\n`;
+        if (aeronave.getTestes.length === 0) {
+            conteudo += 'Nenhum teste cadastrado.\n';
+        } else {
+            aeronave.getTestes.forEach(teste => {
+                conteudo += `Teste: ${teste.getTipo}, Resultado: ${teste.getResultado}\n`;
+            });
+        }
+        conteudo += '---------------------------\n';
+        conteudo += ' \n';
+
+        // Salva o relatório em arquivo
+        fs.writeFileSync(caminho, conteudo);
+        
+        console.log(`\nRelatório gerado com sucesso em: ${caminho}`);
+        this.leitor.question("\nPressione Enter para voltar...", onVoltar);
     }
 }
