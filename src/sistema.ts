@@ -5,6 +5,7 @@ import Funcionario from "./model/Funcionario";
 import * as readline from 'readline';
 
 import GerenciadorAeronave from "./gestao/GerenciadorAeronave";
+import GerenciadorFuncionarios from "./gestao/GerenciadorFuncionarios";
 
 
 export default class AerocodeSystem {
@@ -16,6 +17,7 @@ export default class AerocodeSystem {
     private usuarioLogado: Funcionario | null = null;
 
     private gerenciadorAeronave: GerenciadorAeronave;
+    private gerenciadorFuncionarios: GerenciadorFuncionarios;
 
     constructor() {
         this.leitor = readline.createInterface({
@@ -23,6 +25,7 @@ export default class AerocodeSystem {
             output: process.stdout
         });
         this.gerenciadorAeronave = new GerenciadorAeronave(this.leitor);
+        this.gerenciadorFuncionarios = new GerenciadorFuncionarios(this.leitor);
     }
 
     private criarAdmin(): void {
@@ -93,10 +96,11 @@ export default class AerocodeSystem {
         console.log();
         console.log(`Usuario logado: ${this.usuarioLogado.getNome} (Tipo: ${this.usuarioLogado.getNivelPermissao})`);
         console.log("---- Menu Principal: ----");
-        console.log("[1] Gerenciar Aeronaves");
+        console.log("[1] Gerenciar Aeronave");
         console.log("[2] Adicionar Aeronave");
         console.log("[3] Listar Aeronaves");
         console.log("[4] Remover Aeronave");
+        console.log("[5] Gerenciar Funcionários (Admin)");
         console.log("[0] Logout");
         console.log("-------------------------");
         this.leitor.question("Escolha uma opção: ", (opcao) => {
@@ -108,7 +112,7 @@ export default class AerocodeSystem {
                     if (this.usuarioLogado?.getNivelPermissao === NivelPermissao.ADMINISTRADOR) {
                         this.adicionarAeronave();
                     } else {
-                        console.log("Acesso negado. Apenas administradores podem gerenciar funcionários.");
+                        console.log("Acesso negado. Apenas administradores podem adicionar aeronaves.");
                         setTimeout(() => this.mostrarMenuPrincipal(), 1000);
                     }
                     break;
@@ -121,6 +125,17 @@ export default class AerocodeSystem {
                             this.removerAeronave(codigo);
                             setTimeout(() => this.mostrarMenuPrincipal(), 1000);
                         });
+                    } else {
+                        console.log("Acesso negado. Apenas administradores podem remover aeronaves.");
+                        setTimeout(() => this.mostrarMenuPrincipal(), 1000);
+                    }
+                    break;
+                case '5':
+                    if (this.usuarioLogado?.getNivelPermissao === NivelPermissao.ADMINISTRADOR) {
+                        this.gerenciadorFuncionarios.gerenciar(this.funcionarios, () => this.mostrarMenuPrincipal());
+                    } else {
+                        console.log("Acesso negado. Apenas administradores podem gerenciar funcionários.");
+                        setTimeout(() => this.mostrarMenuPrincipal(), 1000);
                     }
                     break;
                 case '0':
