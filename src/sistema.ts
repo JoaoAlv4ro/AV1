@@ -16,7 +16,7 @@ export default class AerocodeSystem {
 
     private usuarioLogado: Funcionario | null = null;
 
-    private gerenciadorAeronave: GerenciadorAeronave;
+    private gerenciadorAeronave: GerenciadorAeronave | null = null;
     private gerenciadorFuncionarios: GerenciadorFuncionarios;
 
     constructor() {
@@ -24,7 +24,6 @@ export default class AerocodeSystem {
             input: process.stdin,
             output: process.stdout
         });
-        this.gerenciadorAeronave = new GerenciadorAeronave(this.leitor);
         this.gerenciadorFuncionarios = new GerenciadorFuncionarios(this.leitor);
     }
 
@@ -77,6 +76,7 @@ export default class AerocodeSystem {
                 const funcionario = this.funcionarios.find(f => f.getUsuario === user);
                 if (funcionario?.autenticar(user, senha)) {
                     this.usuarioLogado = funcionario;
+                    this.gerenciadorAeronave = new GerenciadorAeronave(this.leitor, funcionario, this.funcionarios);
                     console.log(`Login bem-sucedido! Bem-vindo, ${this.usuarioLogado.getNome}.`);
                     setTimeout(() => this.mostrarMenuPrincipal(), 1000);
                 } else {
@@ -140,6 +140,7 @@ export default class AerocodeSystem {
                     break;
                 case '0':
                     this.usuarioLogado = null;
+                    this.gerenciadorAeronave = null;
                     console.log("Logout realizado com sucesso.");
                     setTimeout(() => this.mostrarMenuAcesso(), 1000);
                     break;
@@ -167,9 +168,14 @@ export default class AerocodeSystem {
             const aeronave = this.aeronaves.find(a => a.getCodigo === codigo);
             if (aeronave) {
                 console.log(`Gerenciando aeronave: ${aeronave.getModelo}`);
-                this.gerenciadorAeronave.gerenciar(aeronave, () => {
-                    this.mostrarMenuPrincipal();
-                });
+                if (this.usuarioLogado && this.gerenciadorAeronave) {
+                    this.gerenciadorAeronave.gerenciar(aeronave, this.usuarioLogado, () => {
+                        this.mostrarMenuPrincipal();
+                    });
+                } else {
+                    console.log("Erro: Usuário não está logado ou gerenciador não inicializado");
+                    setTimeout(() => this.mostrarMenuPrincipal(), 1000);
+                }
             } else {
                 console.log("Aeronave não encontrada.");
                 setTimeout(() => this.mostrarMenuPrincipal(), 1000);

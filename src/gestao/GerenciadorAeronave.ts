@@ -1,8 +1,10 @@
 import * as readline from 'readline';
 import Aeronave from "../model/Aeronave";
 import { TipoAeronave } from "../model/Enums";
+import Funcionario from "../model/Funcionario";
 import GerenciadorPeca from "./GerenciadorPeca";
 import GerenciadorTeste from "./GerenciadorTeste";
+import GerenciadorEtapa from "./GerenciadorEtapa";
 
 
 export default class GerenciadorAeronave {
@@ -10,14 +12,20 @@ export default class GerenciadorAeronave {
 
     private gerenciadorPeca: GerenciadorPeca;
     private gerenciadorTeste: GerenciadorTeste;
+    private gerenciadorEtapa: GerenciadorEtapa;
+    private usuarioLogado: Funcionario;
+    private funcionarios: Funcionario[];
 
-    constructor(leitor: readline.Interface) {
+    constructor(leitor: readline.Interface, usuarioLogado: Funcionario, funcionarios: Funcionario[]) {
         this.leitor = leitor;
+        this.usuarioLogado = usuarioLogado;
+        this.funcionarios = funcionarios;
         this.gerenciadorPeca = new GerenciadorPeca(this.leitor);
         this.gerenciadorTeste = new GerenciadorTeste(this.leitor);
+        this.gerenciadorEtapa = new GerenciadorEtapa(this.leitor);
     }
 
-    public gerenciar(aeronave: Aeronave, onVoltar: () => void): void {
+    public gerenciar(aeronave: Aeronave, usuarioLogado: Funcionario, onVoltar: () => void): void {
         console.log("\nMenu de Gerenciamento:");
         console.log("[1] Editar Aeronave");
         console.log("[2] Gerenciar Peças");
@@ -32,21 +40,20 @@ export default class GerenciadorAeronave {
                     this.editarAeronave(aeronave, onVoltar);
                     break;
                 case '2':
-                    this.gerenciadorPeca.gerenciar(aeronave, () => this.gerenciar(aeronave, onVoltar));
+                    this.gerenciadorPeca.gerenciar(aeronave, () => this.gerenciar(aeronave, this.usuarioLogado, onVoltar));
                     break;
                 case '3':
-                    console.log("Funcionalidade de gerenciamento de etapas ainda não implementada.");
-                    this.gerenciar(aeronave, onVoltar);
+                    this.gerenciadorEtapa.gerenciar(aeronave, this.usuarioLogado, this.funcionarios, () => this.gerenciar(aeronave, this.usuarioLogado, onVoltar));
                     break;
                 case '4':
-                    this.gerenciadorTeste.gerenciar(aeronave, () => this.gerenciar(aeronave, onVoltar));
+                    this.gerenciadorTeste.gerenciar(aeronave, () => this.gerenciar(aeronave, this.usuarioLogado, onVoltar));
                     break;
                 case '0':
                     onVoltar();
                     break;
                 default:
                     console.log("Opção inválida. Tente novamente.");
-                    this.gerenciar(aeronave, onVoltar);
+                    this.gerenciar(aeronave, this.usuarioLogado, onVoltar);
             }
         });
     }
@@ -116,7 +123,7 @@ export default class GerenciadorAeronave {
                     });
                     break;
                 case '0':
-                    this.gerenciar(aeronave, onVoltar);
+                    this.gerenciar(aeronave, this.usuarioLogado, onVoltar);
                     break;
                 default:
                     console.log("Opção inválida. Tente novamente.");
