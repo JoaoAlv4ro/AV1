@@ -10,6 +10,11 @@ export default class GerenciadorPeca {
         this.leitor = leitor;
     }
 
+    private validarCodigoPeca(codigo: string): boolean {
+        // Verifica se é um número e se tem pelo menos 1 dígito
+        return /^\d+$/.test(codigo);
+    }
+
     public gerenciar(aeronave: Aeronave, onVoltar: () => void): void { 
         console.log("\nMenu de Gerenciamento de Peças: ");
         console.log("Aeronave: " + aeronave.getModelo);
@@ -57,7 +62,12 @@ export default class GerenciadorPeca {
         console.log("-------------------------");
 
         
-        this.leitor.question("Digite o código da peça a ser editada: ", (codigo) => {
+        this.leitor.question("Digite o código da peça a ser editada (apenas números): ", (codigo) => {
+            if (!this.validarCodigoPeca(codigo)) {
+                console.log("Código inválido. Use apenas números.");
+                setTimeout(() => onVoltar(), 1000);
+                return;
+            }
             const peca = aeronave.getPecas.find(p => p.getCodigo === codigo);
             if (peca) {
                 console.log(`\nEditando Peça ${peca.getNome}`);
@@ -152,7 +162,12 @@ export default class GerenciadorPeca {
     }
 
     private adicionarPeca(aeronave: Aeronave, onVoltar: () => void): void {
-        this.leitor.question("Digite o código da nova peça: ", (codigo) => {
+        this.leitor.question("Digite o código da nova peça (apenas números): ", (codigo) => {
+            if (!this.validarCodigoPeca(codigo)) {
+                console.log("Código inválido. Use apenas números.");
+                setTimeout(() => onVoltar(), 1000);
+                return;
+            }
             if (aeronave.getPecas.some(p => p.getCodigo === codigo)) {
                 console.log("Já existe uma peça com esse código.");
                 setTimeout(() => onVoltar(), 1000);
@@ -227,6 +242,12 @@ export default class GerenciadorPeca {
 
     private removerPeca(aeronave: Aeronave, onVoltar: () => void): void {
         this.leitor.question("Digite o código da peça a ser removida: ", (codigo) => {
+            if (!this.validarCodigoPeca(codigo)) {
+                console.log("Código inválido. O código deve conter apenas números.");
+                setTimeout(() => onVoltar(), 1000);
+                return;
+            }
+
             const index = aeronave.getPecas.findIndex(p => p.getCodigo === codigo);
             if (index !== -1) {
                 aeronave.getPecas.splice(index, 1);
