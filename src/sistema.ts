@@ -6,6 +6,7 @@ import * as readline from 'readline';
 
 import GerenciadorAeronave from "./gestao/GerenciadorAeronave";
 import GerenciadorFuncionarios from "./gestao/GerenciadorFuncionarios";
+import { GerenciadorPersistencia } from "./gestao/GerenciadorPersistencia";
 
 
 export default class AerocodeSystem {
@@ -18,13 +19,32 @@ export default class AerocodeSystem {
 
     private gerenciadorAeronave: GerenciadorAeronave | null = null;
     private gerenciadorFuncionarios: GerenciadorFuncionarios;
+    private gerenciadorPersistencia: GerenciadorPersistencia;
 
     constructor() {
         this.leitor = readline.createInterface({
             input: process.stdin,
             output: process.stdout
         });
-        this.gerenciadorFuncionarios = new GerenciadorFuncionarios(this.leitor);
+        this.gerenciadorPersistencia = new GerenciadorPersistencia();
+        this.gerenciadorFuncionarios = new GerenciadorFuncionarios(
+            this.leitor,
+            () => this.salvarDados()
+        );
+        this.carregarDados();
+    }
+
+    private carregarDados(): void {
+        const dados = this.gerenciadorPersistencia.carregarEstadoSistema();
+        this.aeronaves = dados.aeronaves;
+        this.funcionarios = dados.funcionarios;
+    }
+
+    private salvarDados(): void {
+        this.gerenciadorPersistencia.salvarEstadoSistema(
+            this.aeronaves,
+            this.funcionarios
+        );
     }
 
     private criarAdmin(): void {
@@ -39,6 +59,7 @@ export default class AerocodeSystem {
             NivelPermissao.ADMINISTRADOR
         );
         this.funcionarios.push(admin);
+        this.salvarDados();
     }
 
     public iniciar(): void {
@@ -211,6 +232,7 @@ export default class AerocodeSystem {
                             parseInt(alcance)
                         );
                         this.aeronaves.push(novaAeronave);
+                        this.salvarDados();
                         console.log(`Aeronave ${modelo} adicionada com sucesso!`);
                         setTimeout(() => this.mostrarMenuPrincipal(), 1000);
                     });
@@ -238,6 +260,7 @@ export default class AerocodeSystem {
         const index = this.aeronaves.findIndex(a => a.getCodigo === codigo);
         if (index !== -1) {
             this.aeronaves.splice(index, 1);
+            this.salvarDados();
             console.log(`Aeronave com código ${codigo} removida com sucesso!`);
         } else {
             console.log("Aeronave não encontrada.");

@@ -4,9 +4,11 @@ import * as readline from 'readline';
 
 export default class GerenciadorFuncionarios {
     private leitor: readline.Interface;
+    private onDadosModificados: () => void;
 
-    constructor(leitor: readline.Interface) {
+    constructor(leitor: readline.Interface, onDadosModificados: () => void) {
         this.leitor = leitor;
+        this.onDadosModificados = onDadosModificados;
     }
 
     public gerenciar(funcionarios: Funcionario[], onVoltar: () => void): void {
@@ -73,9 +75,10 @@ export default class GerenciadorFuncionarios {
                                         setTimeout(onVoltar, 800);
                                         return;
                                 }
-
+                                
+                                const maiorId = Math.max(...funcionarios.map(f => parseInt(f.getId)), 0);
                                 const novoFuncionario = new Funcionario(
-                                    (funcionarios.length + 1).toString(),
+                                    (maiorId + 1).toString(),
                                     nome.trim(),
                                     telefone.trim(),
                                     endereco.trim(),
@@ -84,6 +87,7 @@ export default class GerenciadorFuncionarios {
                                     permissao
                                 );
                                 funcionarios.push(novoFuncionario);
+                                this.onDadosModificados();
                                 console.log(`Funcionário ${nome} adicionado com sucesso!`);
                                 setTimeout(onVoltar, 800);
                             });
@@ -186,6 +190,7 @@ export default class GerenciadorFuncionarios {
             }
             const removido = funcionarios[idx];
             funcionarios.splice(idx, 1);
+            this.onDadosModificados();
             console.log(`Funcionário ${removido.getNome} removido.`);
             setTimeout(onVoltar, 800);
         });
